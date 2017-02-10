@@ -1,6 +1,9 @@
 package andreasphillips.week1game.gdf.mgms.fullsail.edu.week1game;
 
+import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,9 +20,11 @@ import com.shephertz.app42.gaming.multiplayer.client.listener.ConnectionRequestL
 public class GameActivity extends AppCompatActivity implements ConnectionRequestListener, View.OnTouchListener {
 
     private WarpClient theClient;
-    private Button btnConnect;
+    private Button btnConnect, btnGamePlay;
 
     public boolean isConnected = false;
+
+    private int nCount, nWinCon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +34,31 @@ public class GameActivity extends AppCompatActivity implements ConnectionRequest
         btnConnect = (Button)findViewById(R.id.btnConnect);
         btnConnect.setOnTouchListener(this);
 
+        btnGamePlay = (Button)findViewById(R.id.btnGamePlay);
+        btnGamePlay.setOnTouchListener(this);
+
+        nCount = 0;
+        nWinCon = 7;
         init();
     }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
-        if(event.getAction() == event.ACTION_DOWN) {
+        if(event.getAction() == MotionEvent.ACTION_DOWN) {
             if(v.getId() == R.id.btnConnect) {
                 theClient.connectWithUserName("Andreas");
+            }
+            else if(v.getId() == R.id.btnGamePlay) {
+             if(++nCount >= nWinCon) {
+                 Intent i = new Intent(this, MainActivity.class);
+                 startActivity(i);
+                 finish();
+             }
+             else {
+                 final MediaPlayer player = MediaPlayer.create(this, Settings.System.DEFAULT_NOTIFICATION_URI);
+                 player.start();
+                 Toast.makeText(getApplicationContext(), "clicked " + nCount, Toast.LENGTH_SHORT).show();
+             }
             }
         }
         return false;
